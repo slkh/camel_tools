@@ -304,6 +304,73 @@ class CalimaStarAnalyzer:
 
         return combined
 
+    def _combined_patt_backoff_analyses(self,
+                                   stem, surf_patt,
+                                   word_dediac,
+                                   prefix_analyses,
+                                   stem_analyses,
+                                   suffix_analyses):
+        combined = deque()
+        for p in itertools.product(prefix_analyses, stem_analyses):
+            prefix_cat = p[0][0]
+            prefix_feats = p[0][1]
+            stem_cat = p[1][0]
+            stem_feats = copy.copy(p[1][1])
+            if stem_cat in self._db.prefix_stem_compat[prefix_cat]:
+                for suffix_cat, suffix_feats in suffix_analyses:
+                    if ((suffix_cat not in
+                         self._db.stem_suffix_compat[stem_cat]) or
+                        (prefix_cat not in self._db.prefix_suffix_compat or
+                         suffix_cat not in
+                         self._db.prefix_suffix_compat[prefix_cat])):
+                        continue
+
+                    # if (self._backoff_action == 'PROP' and
+                    #         'NOUN_PROP' not in stem_feats['bw']):
+                    #     continue
+
+                    ## surface patt to regex
+                    stem_patt = re.sub('\d', '(.)', surf_patt)
+                    diac_patt_regex = re.sub('(\d)', r'\\\g<1>', stem_feats['diac'])
+                    # d3tok_patt_regex = re.sub('(\d)', r'\\\g<1>', stem_feats['d3tok'])
+                    
+                    
+                    #stem_feats['d3tok'] = re.sub(stem_patt, d3tok_patt_regex, stem)
+                    stem_feats['diac'] = re.sub(stem_patt, diac_patt_regex, stem)
+                    lemma = _LEMMA_SPLIT_RE.split(stem_feats['lex'])[0]
+                    sep = _LEMMA_SPLIT_RE.split(stem_feats['lex'])[1]
+                    cat = _LEMMA_SPLIT_RE.split(stem_feats['lex'])[2]
+                    lex_patt_regex = re.sub('(\d)', r'\\\g<1>', lemma)
+                    stem_feats['lex'] = '{}{}'.format(re.sub(stem_patt, lex_patt_regex, stem), ''.join(_LEMMA_SPLIT_RE.split(stem_feats['lex'])[1:]))
+
+                    # print('me here')
+                    ## BW, mush special such wow, so annoying but so useful
+                    
+                    bw_elements = stem_feats['bw'].split('+')
+                    new_bw = []
+                    for elem in bw_elements:
+                        elem_lex = elem.split('/')[0]
+                        elem_pos = elem.split('/')[1]
+
+                        elem_lex_patt = re.sub('(\d)', r'\\\g<1>', elem_lex)
+                        elem_lex = re.sub(stem_patt, elem_lex_patt, stem)
+                        
+                        elem = '{}/{}'.format(elem_lex, elem_pos)
+                        new_bw.append(elem)
+                    
+                    stem_feats['bw'] = '+'.join(new_bw)
+                    merged = merge_features(self._db, prefix_feats, stem_feats,
+                                            suffix_feats)
+
+                    merged['stem'] = stem_feats['diac']
+                    merged['stemcat'] = stem_cat
+                    merged['source'] = 'patt_backoff'
+                    merged['gloss'] = stem_feats['gloss']
+
+                    combined.append(merged)
+                    # print(combined)
+        return combined
+
     def analyze(self, word):
         """Analyze a given word.
 
