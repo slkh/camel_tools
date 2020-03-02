@@ -146,6 +146,8 @@ class CalimaStarDB:
         self.suffix_hash = {} if self._withAnalysis else None
         self.stem_hash = {} if self._withAnalysis else None
 
+        self.stem_patt_hash = {} if self._withAnalysis else None
+
         self.prefix_cat_hash = {} if self._withGeneration else None
         self.suffix_cat_hash = {} if self._withGeneration else None
         self.lemma_hash = {} if self._withGeneration else None
@@ -368,6 +370,16 @@ class CalimaStarDB:
                 stem = parts[0]
                 category = parts[1]
                 analysis = self._parse_analysis_line_toks(parts[2].split(u' '))
+
+                if stem.startswith('patt-'):
+                    stem = '-'.join(parts[0].split('-')[1:])
+                    if self._withAnalysis:
+                        if stem not in self.stem_patt_hash:
+                            self.stem_patt_hash[stem] = []
+                        self.stem_patt_hash[stem].append((category, analysis))
+                else: 
+                    category = parts[1]
+                    analysis = self._parse_analysis_line_toks(parts[2].split(u' '))
 
                 if self._withAnalysis:
                     if stem not in self.stem_hash:
