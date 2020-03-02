@@ -94,7 +94,7 @@ __version__ = camelt.__version__
 
 
 _ANALYSIS_BACKOFFS = frozenset(('NONE', 'NOAN_ALL', 'NOAN_PROP', 'ADD_ALL',
-                                'ADD_PROP'))
+                                'ADD_PROP', 'NOAN_PATT', 'ADD_PATT'))
 _GENARATION_BACKOFFS = frozenset(('NONE', 'REINFLECT'))
 _BUILTIN_DBS = frozenset([db.name for db in CalimaStarDB.list_builtin_dbs()])
 _DEFAULT_DB = 'almor-msa'
