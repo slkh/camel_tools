@@ -540,7 +540,7 @@ class CalimaStarAnalyzer:
         if ((self._backoff_action == 'PATT' and len(analyses) == 0) or
             (self._backoff_condition == 'ADD') and (self._backoff_action == 'PATT')):
 
-        segments_gen = _segments_gen(word_normal,
+            segments_gen = _segments_gen(word_normal,
                                         self._db.max_prefix_size,
                                         self._db.max_suffix_size)
 
