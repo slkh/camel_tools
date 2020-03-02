@@ -57,6 +57,7 @@ _IS_PUNC_RE = re.compile(u'^[' + re.escape(_ALL_PUNC) + u']+$')
 _HAS_PUNC_RE = re.compile(u'[' + re.escape(_ALL_PUNC) + u']')
 _IS_AR_RE = re.compile(u'^[' + re.escape(u''.join(AR_CHARSET)) + u']+$')
 
+_LEMMA_SPLIT_RE = re.compile(r'(-|_)')
 # Identify No Analysis marker
 _NOAN_RE = re.compile(u'NOAN')
 
@@ -346,26 +347,26 @@ class CalimaStarAnalyzer:
                     # print('me here')
                     ## BW, mush special such wow, so annoying but so useful
                     
-                    bw_elements = stem_feats['bw'].split('+')
-                    new_bw = []
-                    for elem in bw_elements:
-                        elem_lex = elem.split('/')[0]
-                        elem_pos = elem.split('/')[1]
+                    # bw_elements = stem_feats['bw'].split('+')
+                    # new_bw = []
+                    # for elem in bw_elements:
+                    #     elem_lex = elem.split('/')[0]
+                    #     elem_pos = elem.split('/')[1]
 
-                        elem_lex_patt = re.sub('(\d)', r'\\\g<1>', elem_lex)
-                        elem_lex = re.sub(stem_patt, elem_lex_patt, stem)
+                    #     elem_lex_patt = re.sub('(\d)', r'\\\g<1>', elem_lex)
+                    #     elem_lex = re.sub(stem_patt, elem_lex_patt, stem)
                         
-                        elem = '{}/{}'.format(elem_lex, elem_pos)
-                        new_bw.append(elem)
+                    #     elem = '{}/{}'.format(elem_lex, elem_pos)
+                    #     new_bw.append(elem)
                     
-                    stem_feats['bw'] = '+'.join(new_bw)
+                    # stem_feats['bw'] = '+'.join(new_bw)
                     merged = merge_features(self._db, prefix_feats, stem_feats,
                                             suffix_feats)
 
                     merged['stem'] = stem_feats['diac']
                     merged['stemcat'] = stem_cat
                     merged['source'] = 'patt_backoff'
-                    merged['gloss'] = stem_feats['gloss']
+                    # merged['gloss'] = stem_feats['gloss']
 
                     combined.append(merged)
                     # print(combined)
@@ -509,8 +510,7 @@ class CalimaStarAnalyzer:
                     analyses.extend(combined)
 
         if ((self._backoff_condition == 'NOAN' and len(analyses) == 0) or
-                (self._backoff_condition == 'ADD') and self._backoff_action != 'PATT'):
-
+                (self._backoff_condition == 'ADD')) and self._backoff_action != 'PATT':
             segments_gen = _segments_gen(word_normal,
                                          self._db.max_prefix_size,
                                          self._db.max_suffix_size)
@@ -538,86 +538,85 @@ class CalimaStarAnalyzer:
                                                            suffix_analyses)
                 analyses.extend(combined)
         if ((self._backoff_action == 'PATT' and len(analyses) == 0) or
-            (self._backoff_condition == 'ADD') and (self._backoff_action == 'PATT')):
-
+                (self._backoff_condition == 'ADD') and (self._backoff_action == 'PATT')):
             segments_gen = _segments_gen(word_normal,
                                         self._db.max_prefix_size,
                                         self._db.max_suffix_size)
 
         
-        # backoff_cats = self._db.stem_backoffs[self._backoff_action]
-        # stem_analyses = [(cat, analysis)
-        #                  for cat, analysis in self._db.stem_hash['NOAN']
-        #                  if cat in backoff_cats]
-        
-        for segmentation in segments_gen:
-            # print(segmentation)
-            stem_analyses = []
-            prefix = segmentation[0]
-            stem = segmentation[1]
-            suffix = segmentation[2]
-
-            prefix_analyses = self._db.prefix_hash.get(prefix, None)
-            suffix_analyses = self._db.suffix_hash.get(suffix, None)
-
-            ## get stem root radicals, where Ayw are considered part of the pattren
-            orth_root = ''.join(sorted(set(stem) & 
-                            set(stem), key = stem.index))
-
-            orth_root = re.sub('[أاويىآإؤئء]', '', orth_root)
-            ## get the surface pattren with numerals
-            surf_patt = stem
-            for char in orth_root:
-                surf_patt = re.sub(char, str(orth_root.index(char)+1), surf_patt)
-            # get the stem analyses using the special hash based on the stem patt from the db
-            for key in self._db.stem_patt_hash:
-                general_patt = key.split('-')[1]
-                numeric_patt = key.split('-')[0]
-                if re.fullmatch(general_patt, stem) is not None:
-                    if surf_patt == numeric_patt:
-                        print(surf_patt, numeric_patt, stem, key)
-                        stem_analyses.extend(self._db.stem_patt_hash.get(key))
-            
-            if not stem_analyses:
-                print('HEY')
-                stem_analyses = None
-            # stem_analyses = self._db.stem_patt_hash.get(surf_patt, None)
-            if stem_analyses is None:
-                continue
-            if prefix_analyses is None or suffix_analyses is None:
-                continue
-            ## if no pattern match, revert to basic NOAN_PROP backoff
-            # print(stem_analyses is None)
-            ### Add the NOAN_PROP options anyways for now ####################################
-            # if not stem_analyses:
-            # backoff_cats = self._db.stem_backoffs['PROP']
-            # print(backoff_cats)
-            
+            # backoff_cats = self._db.stem_backoffs[self._backoff_action]
             # stem_analyses = [(cat, analysis)
-            #                 for cat, analysis in self._db.stem_hash['NOAN']
-            #                 if cat in backoff_cats]
-            # # print('me here', stem_analyses)
-            # combined = self._combined_backoff_analyses(stem,
-            #                                         word_dediac,
-            #                                         prefix_analyses,
-            #                                         stem_analyses,
-            #                                         suffix_analyses)
-            # analyses.extend(combined)
+            #                  for cat, analysis in self._db.stem_hash['NOAN']
+            #                  if cat in backoff_cats]
             
-                # print(combined)
-            ###################################################################################
-            # else:
-            # stem_analyses = self._db.stem_patt_hash.get(surf_patt, None)
-            # if not stem_analyses:
-            #     continue
-            # print(stem_analyses)
-            combined = self._combined_patt_backoff_analyses(stem, surf_patt,
-                                                        word_dediac,
-                                                        prefix_analyses,
-                                                        stem_analyses,
-                                                        suffix_analyses)
-            
-            analyses.extend(combined)
+            for segmentation in segments_gen:
+                # print(segmentation)
+                stem_analyses = []
+                prefix = segmentation[0]
+                stem = segmentation[1]
+                suffix = segmentation[2]
+
+                prefix_analyses = self._db.prefix_hash.get(prefix, None)
+                suffix_analyses = self._db.suffix_hash.get(suffix, None)
+
+                ## get stem root radicals, where Ayw are considered part of the pattren
+                orth_root = ''.join(sorted(set(stem) & 
+                                set(stem), key = stem.index))
+
+                orth_root = re.sub('[أاويىآإؤئء]', '', orth_root)
+                ## get the surface pattren with numerals
+                surf_patt = stem
+                for char in orth_root:
+                    surf_patt = re.sub(char, str(orth_root.index(char)+1), surf_patt)
+                # get the stem analyses using the special hash based on the stem patt from the db
+                for key in self._db.stem_patt_hash:
+                    general_patt = key.split('-')[1]
+                    numeric_patt = key.split('-')[0]
+                    if re.fullmatch(general_patt, stem) is not None:
+                        if surf_patt == numeric_patt:
+                            # print(surf_patt, numeric_patt, stem, key)
+                            stem_analyses.extend(self._db.stem_patt_hash.get(key))
+                
+                if not stem_analyses:
+                    # print('HEY')
+                    stem_analyses = None
+                # stem_analyses = self._db.stem_patt_hash.get(surf_patt, None)
+                if stem_analyses is None:
+                    continue
+                if prefix_analyses is None or suffix_analyses is None:
+                    continue
+                ## if no pattern match, revert to basic NOAN_PROP backoff
+                # print(stem_analyses is None)
+                ### Add the NOAN_PROP options anyways for now ####################################
+                # if not stem_analyses:
+                # backoff_cats = self._db.stem_backoffs['PROP']
+                # print(backoff_cats)
+                
+                # stem_analyses = [(cat, analysis)
+                #                 for cat, analysis in self._db.stem_hash['NOAN']
+                #                 if cat in backoff_cats]
+                # # print('me here', stem_analyses)
+                # combined = self._combined_backoff_analyses(stem,
+                #                                         word_dediac,
+                #                                         prefix_analyses,
+                #                                         stem_analyses,
+                #                                         suffix_analyses)
+                # analyses.extend(combined)
+                
+                    # print(combined)
+                ###################################################################################
+                # else:
+                # stem_analyses = self._db.stem_patt_hash.get(surf_patt, None)
+                # if not stem_analyses:
+                #     continue
+                # print(stem_analyses)
+                combined = self._combined_patt_backoff_analyses(stem, surf_patt,
+                                                            word_dediac,
+                                                            prefix_analyses,
+                                                            stem_analyses,
+                                                            suffix_analyses)
+                
+                analyses.extend(combined)
             # print('me here', stem)
         result = list(analyses)
 
