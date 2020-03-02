@@ -239,6 +239,27 @@ class CalimaStarAnalyzer:
 
         return combined
 
+    def _match_word(self, surf, surf_patt, stem_patt):
+        for i in range(0, len(surf)):
+            if (surf_patt[i] != stem_patt [i]) and (surf[i] != stem_patt[i]):
+                return False
+        return True
+    def _get_stem_anls(self, surf, surf_patt):
+        anls = []
+        for stem_patt in self._db.stem_patt_hash:
+            if len(stem_patt) != len(surf):
+                continue
+            if stem_patt == surf_patt:
+                anls.extend(self._db.stem_patt_hash[stem_patt])
+            elif self._match_word(surf, surf_patt, stem_patt):
+                anls.extend(self._db.stem_patt_hash[stem_patt])
+            else:
+                continue
+        if anls:
+            return anls
+        else:
+            return None
+
     def _combined_backoff_analyses(self,
                                    stem,
                                    word_dediac,
