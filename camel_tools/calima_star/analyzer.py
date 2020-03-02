@@ -89,7 +89,7 @@ Removes the tatweel/kashida character and does the following conversions:
 
 
 _BACKOFF_TYPES = frozenset(['NONE', 'NOAN_ALL', 'NOAN_PROP', 'ADD_ALL',
-                            'ADD_PROP'])
+                            'ADD_PROP', 'ADD_PATT', 'NOAN_PATT'])
 
 
 class AnalyzedWord(namedtuple('AnalyzedWord', ['word', 'analyses'])):
