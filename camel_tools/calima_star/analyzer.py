@@ -362,7 +362,12 @@ class CalimaStarAnalyzer:
                     # stem_feats['bw'] = '+'.join(new_bw)
                     merged = merge_features(self._db, prefix_feats, stem_feats,
                                             suffix_feats)
+                    # override the generated diacritized text with the word itself (for dev reasons only), remove cat from lex
+                    #TODO: remove override once backoff is official
+                    merged['diac'] = word_dediac
+                    merged['lex'] = _LEMMA_SPLIT_RE.split(merged['lex'])[0]
 
+                    ####
                     merged['stem'] = stem_feats['diac']
                     merged['stemcat'] = stem_cat
                     merged['source'] = 'patt_backoff'
