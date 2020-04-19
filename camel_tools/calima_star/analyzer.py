@@ -283,15 +283,16 @@ class CalimaStarAnalyzer:
                          suffix_cat not in
                          self._db.prefix_suffix_compat[prefix_cat])):
                         continue
-
-                    if (self._backoff_action == 'PROP' and
+                    if 'bw' in stem_feats:
+                        if (self._backoff_action == 'PROP' and
                             'NOUN_PROP' not in stem_feats['bw']):
-                        continue
+                            continue
 
-                    stem_feats['bw'] = _NOAN_RE.sub(stem, stem_feats['bw'])
+                        stem_feats['bw'] = _NOAN_RE.sub(stem, stem_feats['bw'])
                     stem_feats['diac'] = _NOAN_RE.sub(stem, stem_feats['diac'])
                     stem_feats['lex'] = _NOAN_RE.sub(stem, stem_feats['lex'])
-                    stem_feats['caphi'] = simple_ar_to_caphi(stem)
+                    if 'caphi' in stem_feats:
+                        stem_feats['caphi'] = simple_ar_to_caphi(stem)
 
                     merged = merge_features(self._db, prefix_feats, stem_feats,
                                             suffix_feats)
@@ -299,7 +300,8 @@ class CalimaStarAnalyzer:
                     merged['stem'] = stem_feats['diac']
                     merged['stemcat'] = stem_cat
                     merged['source'] = 'backoff'
-                    merged['gloss'] = stem_feats['gloss']
+                    if 'gloss' in stem_feats:
+                        merged['gloss'] = stem_feats['gloss']
 
                     combined.append(merged)
 
