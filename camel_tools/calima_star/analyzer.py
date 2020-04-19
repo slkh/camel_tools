@@ -236,6 +236,10 @@ class CalimaStarAnalyzer:
                     if word_dediac.replace(u'\u0640', '') != merged_dediac:
                         merged['source'] = 'spvar'
 
+                    # override the generated diacritized text with the word itself (for dev reasons only), remove cat from lex
+                    #TODO: remove override once backoff is official
+                    merged['diac'] = word_dediac
+                    merged['lex'] = _LEMMA_SPLIT_RE.split(merged['lex'])[0]
                     combined.append(merged)
 
         return combined
@@ -302,7 +306,10 @@ class CalimaStarAnalyzer:
                     merged['source'] = 'backoff'
                     if 'gloss' in stem_feats:
                         merged['gloss'] = stem_feats['gloss']
-
+                    # override the generated diacritized text with the word itself (for dev reasons only), remove cat from lex
+                    #TODO: remove override once backoff is official
+                    merged['diac'] = word_dediac
+                    merged['lex'] = _LEMMA_SPLIT_RE.split(merged['lex'])[0]
                     combined.append(merged)
 
         return combined
