@@ -352,7 +352,7 @@ class CalimaStarAnalyzer:
                     # cat = _LEMMA_SPLIT_RE.split(stem_feats['lex'])[2]
                     lex_patt_regex = re.sub('(\d)', r'\\\g<1>', stem_feats['lex'])
                     # stem_feats['lex'] = '{}{}'.format(re.sub(stem_patt, lex_patt_regex, stem), ''.join(_LEMMA_SPLIT_RE.split(stem_feats['lex'])[1:]))
-                    stem_feats['lex'] = lex_patt_regex
+                    stem_feats['lex'] = re.sub(stem_patt, lex_patt_regex, stem)
                     # print('me here')
                     ## BW, mush special such wow, so annoying but so useful
                     
