@@ -239,7 +239,7 @@ class CalimaStarAnalyzer:
                     # override the generated diacritized text with the word itself (for dev reasons only), remove cat from lex
                     #TODO: remove override once backoff is official
                     merged['diac'] = word_dediac
-                    merged['lex'] = _LEMMA_SPLIT_RE.split(merged['lex'])[0]
+                    # merged['lex'] = _LEMMA_SPLIT_RE.split(merged['lex'])[0]
                     combined.append(merged)
 
         return combined
@@ -309,7 +309,7 @@ class CalimaStarAnalyzer:
                     # override the generated diacritized text with the word itself (for dev reasons only), remove cat from lex
                     #TODO: remove override once backoff is official
                     merged['diac'] = word_dediac
-                    merged['lex'] = _LEMMA_SPLIT_RE.split(merged['lex'])[0]
+                    # merged['lex'] = _LEMMA_SPLIT_RE.split(merged['lex'])[0]
                     combined.append(merged)
 
         return combined
@@ -347,12 +347,12 @@ class CalimaStarAnalyzer:
                     
                     #stem_feats['d3tok'] = re.sub(stem_patt, d3tok_patt_regex, stem)
                     stem_feats['diac'] = re.sub(stem_patt, diac_patt_regex, stem)
-                    lemma = _LEMMA_SPLIT_RE.split(stem_feats['lex'])[0]
-                    sep = _LEMMA_SPLIT_RE.split(stem_feats['lex'])[1]
-                    cat = _LEMMA_SPLIT_RE.split(stem_feats['lex'])[2]
-                    lex_patt_regex = re.sub('(\d)', r'\\\g<1>', lemma)
-                    stem_feats['lex'] = '{}{}'.format(re.sub(stem_patt, lex_patt_regex, stem), ''.join(_LEMMA_SPLIT_RE.split(stem_feats['lex'])[1:]))
-
+                    # lemma = _LEMMA_SPLIT_RE.split(stem_feats['lex'])[0]
+                    # sep = _LEMMA_SPLIT_RE.split(stem_feats['lex'])[1]
+                    # cat = _LEMMA_SPLIT_RE.split(stem_feats['lex'])[2]
+                    lex_patt_regex = re.sub('(\d)', r'\\\g<1>', stem_feats['lex'])
+                    # stem_feats['lex'] = '{}{}'.format(re.sub(stem_patt, lex_patt_regex, stem), ''.join(_LEMMA_SPLIT_RE.split(stem_feats['lex'])[1:]))
+                    stem_feats['lex'] = lex_patt_regex
                     # print('me here')
                     ## BW, mush special such wow, so annoying but so useful
                     
@@ -374,7 +374,7 @@ class CalimaStarAnalyzer:
                     # override the generated diacritized text with the word itself (for dev reasons only), remove cat from lex
                     #TODO: remove override once backoff is official
                     merged['diac'] = word_dediac
-                    merged['lex'] = _LEMMA_SPLIT_RE.split(merged['lex'])[0]
+                    # merged['lex'] = _LEMMA_SPLIT_RE.split(merged['lex'])[0]
 
                     ####
                     merged['stem'] = stem_feats['diac']
