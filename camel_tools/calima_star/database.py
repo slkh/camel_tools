@@ -174,6 +174,8 @@ class CalimaStarDB:
                     'invalid key value pair {}'.format(repr(tok)))
 
             res[subtoks[0]] = u':'.join(subtoks[1:])
+        if 'lex' in res:
+            res['lex'] = _LEMMA_SPLIT_RE.split(res['lex'])[0]
 
         return res
 
