@@ -316,7 +316,7 @@ class CalimaStarAnalyzer:
 
     def _combined_patt_backoff_analyses(self,
                                    stem, surf_patt,
-                                   word_dediac,
+                                   orth_root, word_dediac,
                                    prefix_analyses,
                                    stem_analyses,
                                    suffix_analyses):
@@ -341,18 +341,22 @@ class CalimaStarAnalyzer:
 
                     ## surface patt to regex
                     stem_patt = re.sub('\d', '(.)', surf_patt)
+                    root_patt = re.sub('.', r'(.)', orth_root)
                     diac_patt_regex = re.sub('(\d)', r'\\\g<1>', stem_feats['diac'])
                     # d3tok_patt_regex = re.sub('(\d)', r'\\\g<1>', stem_feats['d3tok'])
                     
                     
                     #stem_feats['d3tok'] = re.sub(stem_patt, d3tok_patt_regex, stem)
-                    stem_feats['diac'] = re.sub(stem_patt, diac_patt_regex, stem)
+                    # stem_feats['diac'] = re.sub(stem_patt, diac_patt_regex, stem)
+                    stem_feats['diac'] = re.sub(root_patt, diac_patt_regex, orth_root)
                     # lemma = _LEMMA_SPLIT_RE.split(stem_feats['lex'])[0]
                     # sep = _LEMMA_SPLIT_RE.split(stem_feats['lex'])[1]
                     # cat = _LEMMA_SPLIT_RE.split(stem_feats['lex'])[2]
                     lex_patt_regex = re.sub('(\d)', r'\\\g<1>', stem_feats['lex'])
                     # stem_feats['lex'] = '{}{}'.format(re.sub(stem_patt, lex_patt_regex, stem), ''.join(_LEMMA_SPLIT_RE.split(stem_feats['lex'])[1:]))
-                    stem_feats['lex'] = re.sub(stem_patt, lex_patt_regex, stem)
+                    # stem_feats['lex'] = re.sub(stem_patt, lex_patt_regex, stem)
+                    
+                    stem_feats['lex'] = re.sub(root_patt, lex_patt_regex, orth_root)
                     # print('me here')
                     ## BW, mush special such wow, so annoying but so useful
                     
@@ -625,7 +629,7 @@ class CalimaStarAnalyzer:
                 #     continue
                 # print(stem_analyses)
                 combined = self._combined_patt_backoff_analyses(stem, surf_patt,
-                                                            word_dediac,
+                                                            orth_root, word_dediac,
                                                             prefix_analyses,
                                                             stem_analyses,
                                                             suffix_analyses)
