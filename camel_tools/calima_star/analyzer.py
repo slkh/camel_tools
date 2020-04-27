@@ -238,7 +238,7 @@ class CalimaStarAnalyzer:
 
                     # override the generated diacritized text with the word itself (for dev reasons only), remove cat from lex
                     #TODO: remove override once backoff is official
-                    merged['diac'] = word_dediac
+                    merged['diac'] = dediac_ar(merged['diac'])
                     # merged['lex'] = _LEMMA_SPLIT_RE.split(merged['lex'])[0]
                     combined.append(merged)
 
@@ -308,7 +308,7 @@ class CalimaStarAnalyzer:
                         merged['gloss'] = stem_feats['gloss']
                     # override the generated diacritized text with the word itself (for dev reasons only), remove cat from lex
                     #TODO: remove override once backoff is official
-                    merged['diac'] = word_dediac
+                    merged['diac'] = dediac_ar(merged['diac'])
                     # merged['lex'] = _LEMMA_SPLIT_RE.split(merged['lex'])[0]
                     combined.append(merged)
 
@@ -373,7 +373,7 @@ class CalimaStarAnalyzer:
                                             suffix_feats)
                     # override the generated diacritized text with the word itself (for dev reasons only), remove cat from lex
                     #TODO: remove override once backoff is official
-                    merged['diac'] = word_dediac
+                    merged['diac'] = dediac_ar(merged['diac'])
                     # merged['lex'] = _LEMMA_SPLIT_RE.split(merged['lex'])[0]
 
                     ####
