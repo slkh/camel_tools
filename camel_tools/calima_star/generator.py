@@ -35,6 +35,7 @@ from camel_tools.calima_star.errors import GeneratorError
 from camel_tools.calima_star.errors import InvalidGeneratorFeature
 from camel_tools.calima_star.errors import InvalidGeneratorFeatureValue
 from camel_tools.calima_star.utils import merge_features
+from camel_tools.utils.dediac import dediac_ar
 
 
 class CalimaStarGenerator(object):
@@ -190,6 +191,9 @@ class CalimaStarGenerator(object):
 
                             merged = merge_features(self._db, prefix_feats,
                                                     stem_feats, suffix_feats)
+                            # override the generated diacritized text with the word itself (for dev reasons only), remove cat from lex
+                            #TODO: remove override once backoff is official
+                            merged['diac'] = dediac_ar(merged['diac'])
 
                             ignore_analysis = False
                             for feat in feats.keys():
