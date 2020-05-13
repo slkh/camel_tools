@@ -379,6 +379,7 @@ class CalimaStarDB:
                         if stem not in self.stem_patt_hash:
                             self.stem_patt_hash[stem] = []
                         self.stem_patt_hash[stem].append((category, analysis))
+                    continue
                 else: 
                     category = parts[1]
                     analysis = self._parse_analysis_line_toks(parts[2].split(u' '))
